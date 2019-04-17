@@ -31,8 +31,7 @@ public class AWSDataLoader {
   private static final String DURATION_AWS_KEY = "3600";
   private static final String VERSION = "2019-8";
   private static final String OSM_FOLDER[] = {"BKK_4W", "CGK_4W", "MNL_4W"};
-  private static final String DIRECTORY =
-      "/Users/abhinav.sunderrajan/Desktop/OSM-RoadNetworkData/GrabRoad/" + VERSION + "/";
+  private static final String DIRECTORY = "/Users/abhinav.sunderrajan/" + VERSION + "/";
 
   private static BasicAWSCredentials getCredentials(String fileName) throws IOException {
     BufferedReader br = new BufferedReader(new FileReader(fileName));
