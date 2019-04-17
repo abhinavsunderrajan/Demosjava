@@ -15,3 +15,9 @@ Routable OSM road network graph, road network model and dynamic visulaization us
 
 ## Zoomed in view of Jakarata
 ![alt text](https://github.com/abhinavsunderrajan/Demosjava/blob/master/RoadNetworks/Jakarta-Zoom-in.jpg)
+
+# Snap to road
+Some of my work on snap to road alogorithms i.e. Map matching
+
+# LMA
+Some of my attempts at using apache math for simple optimisation problems
