@@ -1,5 +1,5 @@
 # RoadNetworks
-Routable OSM road network graph, road network model and dynamic visulaization using AWT from .pbf
+Routable OSM road network graph, road network model and dynamic visulaization using AWT from .pbf files. Below I show some screen shots of my dynamic visaulzation which provides functionalities such as pan and zoom. Note that all scripts are wirtten in Java 8.
 
 ## Zoomed out Singapore
 ![alt-text](https://github.com/abhinavsunderrajan/Demosjava/blob/master/RoadNetworks/Singapore-zoomed-out.jpg)
