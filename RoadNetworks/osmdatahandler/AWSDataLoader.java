@@ -25,7 +25,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Scanner;
 
-/** Download from s3 */
+/** Downloading from AWS */
 public class AWSDataLoader {
 
   private static final String DURATION_AWS_KEY = "3600";
