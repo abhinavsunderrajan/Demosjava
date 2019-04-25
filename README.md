@@ -4,7 +4,7 @@ Routable OSM road network graph, road network model and dynamic visulaization us
 ## Zoomed out Singapore
 ![alt-text](https://github.com/abhinavsunderrajan/Demosjava/blob/master/RoadNetworks/Singapore-zoomed-out.jpg)
 
-## Zoomed in SG
+## Zoomed in Singapore
 ![alt-text](https://github.com/abhinavsunderrajan/Demosjava/blob/master/RoadNetworks/Singapore-zoom-in.jpg)
 
 ## Hover over a way in OSM with mouse pointer to see wayid
