@@ -23,6 +23,9 @@ public class DirectedGraphDemo {
 	    vertices.put(i + "", v);
 	}
 
+	/**
+	 * The graph is fully connected iff we add the last edge.
+	 */
 	graph.addEdge(vertices.get("0"), vertices.get("1"));
 	graph.addEdge(vertices.get("0"), vertices.get("4"));
 	graph.addEdge(vertices.get("1"), vertices.get("2"));
@@ -30,14 +33,18 @@ public class DirectedGraphDemo {
 	graph.addEdge(vertices.get("1"), vertices.get("4"));
 	graph.addEdge(vertices.get("2"), vertices.get("3"));
 	graph.addEdge(vertices.get("3"), vertices.get("4"));
+	graph.addEdge(vertices.get("4"), vertices.get("0"));
 
 	graph.printGraph();
-	System.out.println("__________________________");
+	System.out.println("___________ BFS Traversal _______________");
 	graph.traverseAndPrintBFS(vertices.get("0"));
 	vertices.values().stream().forEach(v -> v.setVisited(false));
 
-	System.out.println("\n__________________________");
+	System.out.println("\n___________  DFS Traversal _______________");
 	graph.traverseAndPrintDFS(vertices.get("0"));
+	vertices.values().stream().forEach(v -> v.setVisited(false));
+	System.out.println("\n--- All shortest paths ---------");
+	graph.findAllPaths(vertices.get("1"), vertices.get("4"));
     }
 
 }

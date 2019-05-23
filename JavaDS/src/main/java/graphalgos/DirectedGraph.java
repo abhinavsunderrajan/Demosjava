@@ -97,4 +97,38 @@ public class DirectedGraph {
 
     }
 
+    /**
+     * Find all paths between source and destination vertices. Uses breadth first
+     * search implementation.
+     * 
+     * @param source
+     * @param dest
+     */
+    public void findAllPaths(Vertex source, Vertex dest) {
+	Queue<ArrayList<Vertex>> q = new LinkedList<>();
+	ArrayList<Vertex> path = new ArrayList<>();
+	path.add(source);
+	q.add(path);
+	while (!q.isEmpty()) {
+	    path = q.poll();
+	    Vertex last = path.get(path.size() - 1);
+
+	    // if last vertex is the desired destination
+	    // then print the path
+	    if (last.equals(dest))
+		System.out.println(path);
+
+	    for (Vertex n : adjacencyList.get(last)) {
+		if (!path.contains(n)) {
+		    n.setVisited(true);
+		    ArrayList<Vertex> newPath = new ArrayList<>(path);
+		    newPath.add(n);
+		    q.add(newPath);
+		}
+	    }
+
+	}
+
+    }
+
 }

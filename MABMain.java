@@ -53,6 +53,7 @@ public class MABMain {
       return indices.get(RANDOM.nextInt(indices.size()));
     }
 
+    // this is nothing but a moving average of rewards
     // Update Q action-value using:
     // Q(a) <- Q(a) + 1/(k+1) * (r(a) - Q(a))
     public void update_Q(int action, double reward) {
