@@ -26,14 +26,14 @@ public class DirectedGraphDemo {
 	/**
 	 * The graph is fully connected iff we add the last edge.
 	 */
-	graph.addEdge(vertices.get("0"), vertices.get("1"));
-	graph.addEdge(vertices.get("0"), vertices.get("4"));
-	graph.addEdge(vertices.get("1"), vertices.get("2"));
-	graph.addEdge(vertices.get("1"), vertices.get("3"));
-	graph.addEdge(vertices.get("1"), vertices.get("4"));
-	graph.addEdge(vertices.get("2"), vertices.get("3"));
-	graph.addEdge(vertices.get("3"), vertices.get("4"));
-	graph.addEdge(vertices.get("4"), vertices.get("0"));
+	graph.addEdge(vertices.get("0"), vertices.get("1"), 1.0);
+	graph.addEdge(vertices.get("0"), vertices.get("4"), 1.0);
+	graph.addEdge(vertices.get("1"), vertices.get("2"), 1.0);
+	graph.addEdge(vertices.get("1"), vertices.get("3"), 1.0);
+	graph.addEdge(vertices.get("1"), vertices.get("4"), 1.0);
+	graph.addEdge(vertices.get("2"), vertices.get("3"), 1.0);
+	graph.addEdge(vertices.get("3"), vertices.get("4"), 1.0);
+	graph.addEdge(vertices.get("4"), vertices.get("0"), 1.0);
 
 	graph.printGraph();
 	System.out.println("___________ BFS Traversal _______________");
@@ -45,6 +45,9 @@ public class DirectedGraphDemo {
 	vertices.values().stream().forEach(v -> v.setVisited(false));
 	System.out.println("\n--- All shortest paths ---------");
 	graph.findAllPaths(vertices.get("1"), vertices.get("4"));
+
+	vertices.values().stream().forEach(v -> v.setVisited(false));
+	System.out.println("Is graph cyclic?\n" + graph.isCyclic());
     }
 
 }

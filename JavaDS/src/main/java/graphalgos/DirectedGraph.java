@@ -16,7 +16,7 @@ import java.util.Queue;
  */
 public class DirectedGraph {
 
-    private Map<Vertex, ArrayList<Vertex>> adjacencyList;
+    private Map<Vertex, ArrayList<Edge>> adjacencyList;
 
     public DirectedGraph() {
 	adjacencyList = new HashMap<>();
@@ -28,19 +28,20 @@ public class DirectedGraph {
      * @param vertex
      */
     public void addVertex(Vertex vertex) {
-	adjacencyList.put(vertex, new ArrayList<Vertex>(50));
+	adjacencyList.put(vertex, new ArrayList<Edge>(20));
 
     }
 
     /**
-     * Add an edge from the source
+     * Add a weighted edge from source to destination.
      * 
      * @param source
      * @param destination
+     * @param weight
      */
-    public void addEdge(Vertex source, Vertex destination) {
+    public void addEdge(Vertex source, Vertex destination, double weight) {
 	if (adjacencyList.containsKey(source) && adjacencyList.containsKey(destination))
-	    adjacencyList.get(source).add(destination);
+	    adjacencyList.get(source).add(new Edge(source, destination, weight));
 	else
 	    throw new IllegalArgumentException("Source or destination vertex does not exist in the Graph");
 
@@ -50,7 +51,7 @@ public class DirectedGraph {
      * Basically prints the adjacency list.
      */
     public void printGraph() {
-	for (Entry<Vertex, ArrayList<Vertex>> entry : adjacencyList.entrySet())
+	for (Entry<Vertex, ArrayList<Edge>> entry : adjacencyList.entrySet())
 	    System.out.println(entry.getKey().getLabel() + " --> " + entry.getValue());
     }
 
@@ -66,7 +67,8 @@ public class DirectedGraph {
 	while (!q.isEmpty()) {
 	    Vertex node = q.poll();
 	    node.setVisited(true);
-	    for (Vertex n : adjacencyList.get(node)) {
+	    for (Edge e : adjacencyList.get(node)) {
+		Vertex n = e.getDestination();
 		if (!n.isVisited()) {
 		    n.setVisited(true);
 		    q.add(n);
@@ -90,7 +92,8 @@ public class DirectedGraph {
 	if (adjacencyList.get(source).size() == 0)
 	    return;
 
-	for (Vertex n : adjacencyList.get(source)) {
+	for (Edge e : adjacencyList.get(source)) {
+	    Vertex n = e.getDestination();
 	    if (!n.isVisited())
 		traverseAndPrintDFS(n);
 	}
@@ -118,7 +121,8 @@ public class DirectedGraph {
 	    if (last.equals(dest))
 		System.out.println(path);
 
-	    for (Vertex n : adjacencyList.get(last)) {
+	    for (Edge e : adjacencyList.get(last)) {
+		Vertex n = e.getDestination();
 		if (!path.contains(n)) {
 		    n.setVisited(true);
 		    ArrayList<Vertex> newPath = new ArrayList<>(path);
@@ -129,6 +133,45 @@ public class DirectedGraph {
 
 	}
 
+    }
+
+    private boolean isCyclicUtil(Vertex vertex) {
+	// Mark the current node as visited and
+	// part of recursion stack
+	if (vertex.isPartOfRecStack())
+	    return true;
+
+	if (vertex.isVisited())
+	    return false;
+
+	vertex.setVisited(true);
+	vertex.setPartOfRecStack(true);
+
+	for (Edge e : adjacencyList.get(vertex)) {
+	    Vertex dest = e.getDestination();
+	    if (isCyclicUtil(dest))
+		return true;
+	}
+
+	vertex.setPartOfRecStack(false);
+	return false;
+    }
+
+    /**
+     * Returns true if the graph contains a cycle, else false. This function is a
+     * variation of DFS().
+     * 
+     * @return true if graph is
+     */
+    public boolean isCyclic() {
+
+	// Call the recursive helper function to
+	// detect cycle in different DFS trees
+	for (Vertex vertex : adjacencyList.keySet())
+	    if (isCyclicUtil(vertex))
+		return true;
+
+	return false;
     }
 
 }

@@ -9,6 +9,7 @@ package graphalgos;
 public class Vertex {
     private String label;
     private boolean visited;
+    private boolean isPartOfRecStack;
 
     public Vertex(String label) {
 	this.label = label;
@@ -47,6 +48,26 @@ public class Vertex {
 
     public void setVisited(boolean visited) {
 	this.visited = visited;
+    }
+
+    /**
+     * To keep track of node being part of recursion stack or not for DFS like
+     * operation purposes purposes.
+     * 
+     * @return
+     */
+    public boolean isPartOfRecStack() {
+	return isPartOfRecStack;
+    }
+
+    /**
+     * Set if node is already part of recursion stack. Used for DFS kind of
+     * operations.
+     * 
+     * @param isPartOfRecStack
+     */
+    public void setPartOfRecStack(boolean isPartOfRecStack) {
+	this.isPartOfRecStack = isPartOfRecStack;
     }
 
 }
