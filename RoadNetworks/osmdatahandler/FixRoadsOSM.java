@@ -1,24 +1,26 @@
 package osmdatahandler;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.ResultSet;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
 import com.vividsolutions.jts.io.ParseException;
 
+import networkmodel.OSMRoadNetworkModel;
 import networkmodel.Road;
 import networkmodel.RoadNode;
-import networkutils.DatabaseAccess;
 
 /**
  * Post process the road network for normalization.
@@ -29,162 +31,73 @@ import networkutils.DatabaseAccess;
  */
 public class FixRoadsOSM {
 
-    private Map<Long, RoadNode> allNodes = new HashMap<Long, RoadNode>();
-    private Set<Road> cityRoads = new HashSet<Road>();
-    private Set<RoadNode> beginAndEndNodes = new HashSet<RoadNode>();
-    private static DatabaseAccess access;
-    private String roadDataTableName;
-    private String nodeDataTableName;
+    private OSMRoadNetworkModel roadNetworkModel;
     private static int cityId;
     private static String mapVersion;
 
     /**
-     * 
-     * @param dbConnectionProperties
-     */
-    private FixRoadsOSM(Properties dbConnectionProperties, String roadDataTableName, String nodeDataTableName) {
-	access = new DatabaseAccess(dbConnectionProperties);
-	this.roadDataTableName = roadDataTableName;
-	this.nodeDataTableName = nodeDataTableName;
-
-    }
-
-    private void loadNodesAndRoads() throws SQLException, FileNotFoundException, IOException, ParseException {
-
-	allNodes.clear();
-	cityRoads.clear();
-	beginAndEndNodes.clear();
-
-	ResultSet rs = access.retrieveQueryResult("SELECT node_id,longitude,latitude FROM " + nodeDataTableName
-		+ " where city_id=" + cityId + " and map_version='" + mapVersion + "'");
-	while (rs.next()) {
-	    RoadNode node = new RoadNode(rs.getLong("node_id"), rs.getDouble("longitude"), rs.getDouble("latitude"));
-	    allNodes.put(node.getNodeId(), node);
-
-	}
-
-	rs.close();
-
-	rs = access.retrieveQueryResult("SELECT road_id,nodes,roadname,lanes,oneway,roadtype,is_tunnel FROM "
-		+ roadDataTableName + " where city_id=" + cityId + " and map_version='" + mapVersion + "'");
-	while (rs.next()) {
-	    Long roadId = rs.getLong("road_id");
-	    String nodeList = rs.getString("nodes");
-	    String[] split = nodeList.split(",");
-	    List<RoadNode> roadNodes = new ArrayList<>();
-
-	    Road road = new Road(roadId);
-	    road.setLaneCount(rs.getInt("lanes"));
-	    road.setRoadType(rs.getString("roadtype"));
-	    road.setOneWay(rs.getBoolean("oneway"));
-	    road.setName(rs.getString("roadname"));
-	    road.setTunnel(rs.getBoolean("is_tunnel"));
-
-	    for (int i = 0; i < split.length; i++) {
-		Long nodeId = Long.parseLong(split[i]);
-		RoadNode node = allNodes.get(nodeId);
-		if (i == 0) {
-		    beginAndEndNodes.add(node);
-		    road.setBeginNode(node);
-		    node.getOutRoads().add(road);
-		    if (!road.isOneWay()) {
-			node.getInRoads().add(road);
-		    }
-		} else if ((i == split.length - 1)) {
-		    beginAndEndNodes.add(node);
-		    road.setEndNode(node);
-		    node.getInRoads().add(road);
-		    if (!road.isOneWay()) {
-			node.getOutRoads().add(road);
-		    }
-
-		} else {
-		    node.getInRoads().add(road);
-		    node.getOutRoads().add(road);
-		    node.setBeginOrEnd(false);
-		}
-		roadNodes.add(allNodes.get(nodeId));
-	    }
-
-	    road.setRoadNodes(roadNodes);
-	    cityRoads.add(road);
-	}
-    }
-
-    /**
      * Fix the code here. This needs to be done recursively.
+     * 
      * 
      * @return
      * @throws SQLException
      */
     public void splitRoadsAtIntersections() throws SQLException {
 
-	ResultSet rs = access.retrieveQueryResult("select max(road_id) AS maxRoadId from " + roadDataTableName
-		+ " where city_id=" + cityId + " and map_version='" + mapVersion + "'");
-	long maxRoadId = 0;
-	while (rs.next())
-	    maxRoadId = rs.getLong("maxRoadId");
-
-	Statement statement = access.getConnect().createStatement();
+	long maxRoadId = roadNetworkModel.getAllRoadsMap().values().stream().mapToLong(road -> road.getRoadId()).max()
+		.getAsLong();
 
 	// For beginning and end nodes.
-	int roadNum = 0;
-	for (Road splitRoad : cityRoads) {
+	Set<Road> newRoads = new HashSet<>();
+
+	for (Road splitRoad : roadNetworkModel.getAllRoadsMap().values()) {
 	    List<Integer> splits = new ArrayList<>();
-	    for (int i = 1; i < splitRoad.getRoadNodes().size() - 1; i++) {
-		if (beginAndEndNodes.contains(splitRoad.getRoadNodes().get(i)))
+	    for (int i = 1; i < splitRoad.getRoadNodes().size() - 1; i++)
+		if (roadNetworkModel.getBeginAndEndNodes().contains(splitRoad.getRoadNodes().get(i)))
 		    splits.add(i);
-	    }
 
 	    if (splits.size() > 0) {
-		++roadNum;
-		if (roadNum % 1000 == 0) {
-		    statement.executeBatch();
-		    statement.close();
-		    statement = access.getConnect().createStatement();
-		    System.out.println(
-			    roadNum + "\t" + splitRoad.getRoadId() + "\t" + splitRoad.getRoadNodes() + "\t" + splits);
-		}
-
-		StringBuffer[] buffers = new StringBuffer[splits.size() + 1];
-		for (int i = 0; i < buffers.length; i++)
-		    buffers[i] = new StringBuffer("");
+		ArrayList<RoadNode> nodesListArray[] = new ArrayList[splits.size() + 1];
+		// initializing
+		for (int i = 0; i < splits.size() + 1; i++)
+		    nodesListArray[i] = new ArrayList<RoadNode>();
 
 		int index = 0;
 		int j = 0;
 
 		for (int i = 0; i < splitRoad.getRoadNodes().size(); i++) {
-
 		    if (index == splits.size()) {
-			buffers[j].append(splitRoad.getRoadNodes().get(i).getNodeId() + ",");
+			nodesListArray[j].add(splitRoad.getRoadNodes().get(i));
 		    } else {
 			if (i == splits.get(index)) {
-			    buffers[j].append(splitRoad.getRoadNodes().get(i).getNodeId());
+			    nodesListArray[j].add(splitRoad.getRoadNodes().get(i));
 			    j++;
 			    index++;
 			}
-			buffers[j].append(splitRoad.getRoadNodes().get(i).getNodeId() + ",");
+			nodesListArray[j].add(splitRoad.getRoadNodes().get(i));
 		    }
 
 		}
 
-		buffers[j].deleteCharAt(buffers[j].length() - 1);
-
-		for (int i = 0; i < buffers.length; i++) {
+		for (int i = 0; i < nodesListArray.length; i++) {
 		    if (i == 0) {
-			statement.addBatch("UPDATE " + roadDataTableName + " SET nodes='" + buffers[i].toString()
-				+ "' WHERE road_id = " + splitRoad.getRoadId() + " and city_id=" + cityId
-				+ " and map_version='" + mapVersion + "'");
+			splitRoad.setRoadNodes(nodesListArray[i]);
 		    } else {
 
 			String roadName = splitRoad.getName() == null ? null : splitRoad.getName().replace("'", "''");
-			String query = "INSERT INTO " + roadDataTableName
-				+ " (road_id,nodes,roadname,lanes,oneway,roadtype,city_id,map_version,is_routable,is_tunnel) VALUES("
-				+ ++maxRoadId + ",'" + buffers[i].toString() + "','" + roadName + "',"
-				+ splitRoad.getLaneCount() + "," + splitRoad.isOneWay() + ",'" + splitRoad.getRoadType()
-				+ "'," + cityId + ", '" + mapVersion + "',true," + splitRoad.isTunnel() + ")";
+			long roadId = ++maxRoadId;
+			Road newRoad = new Road(roadId);
+			newRoad.setLaneCount(splitRoad.getLaneCount());
 
-			statement.addBatch(query);
+			newRoad.setRoadType(splitRoad.getRoadType());
+			newRoad.setOneWay(splitRoad.isOneWay());
+			newRoad.setName(roadName);
+
+			newRoad.setRoadNodes(nodesListArray[i]);
+			newRoad.setTunnel(splitRoad.isTunnel());
+			newRoad.setRoundabout(splitRoad.isRoundabout());
+			newRoads.add(newRoad);
+
 		    }
 
 		}
@@ -193,8 +106,9 @@ public class FixRoadsOSM {
 
 	}
 
-	statement.executeBatch();
-	statement.close();
+	System.out.println("Created " + newRoads.size() + " new split roads");
+	for (Road newRoad : newRoads)
+	    roadNetworkModel.getAllRoadsMap().put(newRoad.getRoadId(), newRoad);
 
     }
 
@@ -207,9 +121,8 @@ public class FixRoadsOSM {
     private int mergeRoads() throws SQLException {
 	Set<Road> ignore = new HashSet<>();
 	int mergedCount = 0;
-	Statement statement = access.getConnect().createStatement();
 
-	for (Road road : cityRoads) {
+	for (Road road : roadNetworkModel.getAllRoadsMap().values()) {
 	    if (ignore.contains(road))
 		continue;
 
@@ -234,36 +147,10 @@ public class FixRoadsOSM {
 		    i++;
 		}
 
-		StringBuffer buffer = new StringBuffer("");
-		for (int x = 0; x < road.getRoadNodes().size(); x++) {
-		    if (x == road.getRoadNodes().size() - 1)
-			buffer.append(road.getRoadNodes().get(x).getNodeId() + "");
-		    else
-			buffer.append(road.getRoadNodes().get(x).getNodeId() + ",");
-		}
-
-		// delete out road
-		statement.addBatch("DELETE FROM " + roadDataTableName + " where road_id=" + outRoad.getRoadId()
-			+ " and city_id=" + cityId + " and map_version='" + mapVersion + "'");
-
-		// update the merged road in the database.
-		statement.addBatch("UPDATE " + roadDataTableName + " SET nodes='" + buffer.toString()
-			+ "' WHERE road_id=" + road.getRoadId() + " and city_id=" + cityId + " and map_version='"
-			+ mapVersion + "'");
-
-		ignore.add(outRoad);
+		roadNetworkModel.getAllRoadsMap().remove(outRoad.getRoadId());
 		++mergedCount;
-		if (mergedCount % 1000 == 0) {
-		    statement.executeBatch();
-		    statement.close();
-		    statement = access.getConnect().createStatement();
-		}
-
 	    }
-
 	}
-	statement.executeBatch();
-	statement.close();
 
 	return mergedCount;
     }
@@ -274,33 +161,59 @@ public class FixRoadsOSM {
 	if (mapVersion == "" || mapVersion == null)
 	    throw new IllegalArgumentException("Enter a correct map version to proceed");
 
-	System.out.println("loading roads and nodes for city " + cityId + " version " + mapVersion);
+	Properties properties = new Properties();
+	properties.load(new FileInputStream("src/main/resources/config.properties"));
 
-	Properties dbConnectionProperties = new Properties();
-	dbConnectionProperties.load(new FileInputStream("src/main/resources/connectionAWS.properties"));
-	FixRoadsOSM clean = new FixRoadsOSM(dbConnectionProperties, "osm_pbf.roads", "osm_pbf.nodes");
-	/*
-	 * clean.loadNodesAndRoads();
-	 * 
-	 * System.out.println("finished loading ");
-	 * 
-	 * // just assigning a random number for the loop to begin
-	 * 
-	 * System.out.println("merging roads"); int mergedCount = 1000; do { mergedCount
-	 * = clean.mergeRoads(); clean.loadNodesAndRoads();
-	 * System.out.println("finished merging roads " + mergedCount + " roads"); }
-	 * while (mergedCount > 0);
-	 */
+	String dirRoadNetworkFiles = properties.getProperty("road.network.files.dir");
+
+	FixRoadsOSM clean = new FixRoadsOSM();
+	clean.roadNetworkModel = new OSMRoadNetworkModel(
+		dirRoadNetworkFiles + mapVersion + "/unnormalized/" + "roads_" + cityId + "_" + mapVersion + ".txt",
+		dirRoadNetworkFiles + mapVersion + "/unnormalized/" + "nodes_" + cityId + "_" + mapVersion + ".txt",
+		cityId, 5, false, false);
 
 	System.out.println("Splitting roads at intersections");
-	clean.loadNodesAndRoads();
 	clean.splitRoadsAtIntersections();
 	System.out.println("Finished splitting roads at intersections");
 
-	access.executeUpdate("UPDATE " + clean.roadDataTableName + " SET is_routable=true" + " where city_id=" + cityId
-		+ " and map_version='" + mapVersion + "'");
+	System.out.println("write normalized road network to file..");
 
-	access.closeConnection();
+	dirRoadNetworkFiles = dirRoadNetworkFiles + mapVersion + "/normalized";
+
+	File directory = new File(dirRoadNetworkFiles);
+	if (!directory.exists()) {
+	    Path dir = Paths.get(dirRoadNetworkFiles);
+	    Files.createDirectories(dir);
+	}
+
+	System.out.println("Writing normalized roads for city " + cityId + " to file.");
+
+	BufferedWriter bw = new BufferedWriter(
+		new FileWriter(new File(dirRoadNetworkFiles + "/roads_" + cityId + "_" + mapVersion + ".txt")));
+	bw.write(
+		"road_id\tnodes\troadname\tlanes\tis_oneway\troadtype\tcity_id\tmap_version\tis_routable\tis_tunnel\tis_roundabout\n");
+
+	for (Road road : clean.roadNetworkModel.getAllRoadsMap().values()) {
+	    StringBuffer buffer = new StringBuffer("");
+	    List<RoadNode> nodeIds = road.getRoadNodes();
+	    for (int i = 0; i < nodeIds.size(); i++) {
+		if (i == nodeIds.size() - 1) {
+		    buffer.append(nodeIds.get(i).getNodeId());
+		} else {
+		    buffer.append(nodeIds.get(i).getNodeId() + ",");
+		}
+	    }
+
+	    bw.write(road.getRoadId() + "\t" + buffer.toString() + "\t" + road.getName() + "\t" + road.getLaneCount()
+		    + "\t" + road.isOneWay() + "\t" + road.getRoadType() + "\t" + cityId + "\t" + mapVersion + "\t"
+		    + false + "\t" + road.isTunnel() + "\t" + road.isRoundabout() + "\n");
+
+	}
+	// you need to add what ever is left
+	bw.flush();
+	bw.close();
+
+	System.out.println("finished writing roads for city " + cityId + " to file..");
 
     }
 

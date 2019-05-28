@@ -174,4 +174,8 @@ public class DirectedGraph {
 	return false;
     }
 
+    public Map<Vertex, ArrayList<Edge>> getAdjacencyList() {
+	return adjacencyList;
+    }
+
 }
