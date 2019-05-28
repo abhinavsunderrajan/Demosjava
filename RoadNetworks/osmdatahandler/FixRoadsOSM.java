@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.Set;
 
 import com.vividsolutions.jts.io.ParseException;
@@ -156,8 +157,13 @@ public class FixRoadsOSM {
     }
 
     public static void main(String[] args) throws FileNotFoundException, IOException, SQLException, ParseException {
-	mapVersion = args[0];
-	cityId = Integer.parseInt(args[1]);
+	Scanner scanner = new Scanner(System.in);
+	System.out.print("Enter Map version: ");
+	mapVersion = scanner.nextLine();
+	System.out.print("Enter city ID: ");
+	cityId = scanner.nextInt();
+	scanner.close();
+
 	if (mapVersion == "" || mapVersion == null)
 	    throw new IllegalArgumentException("Enter a correct map version to proceed");
 
@@ -206,7 +212,7 @@ public class FixRoadsOSM {
 
 	    bw.write(road.getRoadId() + "\t" + buffer.toString() + "\t" + road.getName() + "\t" + road.getLaneCount()
 		    + "\t" + road.isOneWay() + "\t" + road.getRoadType() + "\t" + cityId + "\t" + mapVersion + "\t"
-		    + false + "\t" + road.isTunnel() + "\t" + road.isRoundabout() + "\n");
+		    + true + "\t" + road.isTunnel() + "\t" + road.isRoundabout() + "\n");
 
 	}
 	// you need to add what ever is left
