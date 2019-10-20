@@ -1,6 +1,6 @@
 package main;
 
-import ds.BinaryTree;
+import datastructures.BinaryTree;
 
 /**
  * Testing my Binary tree implementation.

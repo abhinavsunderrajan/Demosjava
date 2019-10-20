@@ -1,6 +1,6 @@
 package main;
 
-import ds.LinkedList;
+import datastructures.LinkedList;
 
 /**
  * Testing my linked list code.
@@ -20,7 +20,10 @@ public class LinkedListDemo {
 
 	ls.addHead(0);
 	ls.printListContents();
+
 	ls.insertValueAtIndex(5, 5);
+	ls.printListContents();
+	ls.reverseList();
 	ls.printListContents();
 	ls.delNodeAtIndex(0);
 	ls.printListContents();

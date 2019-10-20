@@ -1,4 +1,4 @@
-package ds;
+package datastructures;
 
 /**
  * Abhinav's implementation of linked list
@@ -19,6 +19,10 @@ public class LinkedList<T> {
 	public Node(T value, Node next) {
 	    this.value = value;
 	    this.next = next;
+	}
+
+	public String toString() {
+	    return value.toString();
 	}
 
     }
@@ -64,7 +68,7 @@ public class LinkedList<T> {
 		nextNode = nextNode.next;
 	    }
 	    buffer.replace(buffer.length() - 1, buffer.length(), "]");
-	    System.out.println(buffer.toString() + " --> " + size);
+	    System.out.println(buffer.toString());
 
 	} else
 	    System.out.println("empty list");
@@ -132,8 +136,10 @@ public class LinkedList<T> {
     /**
      * Search if a a value val is present in the linked list
      * 
-     * @param head start the recursion at the head
-     * @param val  the value that you are searching for.
+     * @param head
+     *            start the recursion at the head
+     * @param val
+     *            the value that you are searching for.
      * @return
      */
     public boolean search(Node head, T val) {
@@ -162,6 +168,20 @@ public class LinkedList<T> {
      */
     public Node getHead() {
 	return head;
+    }
+
+    public void reverseList() {
+	Node next = null;
+	Node current = this.head;
+	Node prev = null;
+	while (current != null) {
+	    next = current.next;
+	    current.next = prev;
+	    prev = current;
+	    current = next;
+
+	}
+	this.head = prev;
     }
 
 }
