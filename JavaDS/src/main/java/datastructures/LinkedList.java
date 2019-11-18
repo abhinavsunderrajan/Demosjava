@@ -32,7 +32,7 @@ public class LinkedList<T> {
      * 
      * @param value
      */
-    public void addHead(T value) {
+    private void addHead(T value) {
 	head = new Node(value, head);
 	size++;
     }

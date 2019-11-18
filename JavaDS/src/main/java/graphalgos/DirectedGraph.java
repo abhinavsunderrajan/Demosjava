@@ -108,12 +108,12 @@ public class DirectedGraph {
      * @param dest
      */
     public void findAllPaths(Vertex source, Vertex dest) {
-	Queue<ArrayList<Vertex>> q = new LinkedList<>();
+	Queue<ArrayList<Vertex>> pathQueue = new LinkedList<>();
 	ArrayList<Vertex> path = new ArrayList<>();
 	path.add(source);
-	q.add(path);
-	while (!q.isEmpty()) {
-	    path = q.poll();
+	pathQueue.add(path);
+	while (!pathQueue.isEmpty()) {
+	    path = pathQueue.poll();
 	    Vertex last = path.get(path.size() - 1);
 
 	    // if last vertex is the desired destination
@@ -122,12 +122,12 @@ public class DirectedGraph {
 		System.out.println(path);
 
 	    for (Edge e : adjacencyList.get(last)) {
-		Vertex n = e.getDestination();
-		if (!path.contains(n)) {
-		    n.setVisited(true);
+		Vertex next = e.getDestination();
+		if (!path.contains(next)) {
+		    next.setVisited(true);
 		    ArrayList<Vertex> newPath = new ArrayList<>(path);
-		    newPath.add(n);
-		    q.add(newPath);
+		    newPath.add(next);
+		    pathQueue.add(newPath);
 		}
 	    }
 

@@ -93,10 +93,10 @@ public class Heap<T extends Comparable<T>> {
      * @return
      */
     private boolean compare(int first, int second) {
-	if (minHeap && arr[first].compareTo(arr[second]) > 0)
-	    return true;
+	if (minHeap)
+	    return arr[first].compareTo(arr[second]) > 0;
 	else
-	    return false;
+	    return arr[first].compareTo(arr[second]) < 0;
     }
 
     @Override

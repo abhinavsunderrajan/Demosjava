@@ -18,7 +18,7 @@ public class LinkedListDemo {
 	ls.add(4);
 	ls.add(6);
 
-	ls.addHead(0);
+	ls.add(0);
 	ls.printListContents();
 
 	ls.insertValueAtIndex(5, 5);

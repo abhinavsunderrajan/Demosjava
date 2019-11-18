@@ -52,7 +52,7 @@ public class Vertex {
 
     /**
      * To keep track of node being part of recursion stack or not for DFS like
-     * operation purposes purposes.
+     * operation purposes.
      * 
      * @return
      */
