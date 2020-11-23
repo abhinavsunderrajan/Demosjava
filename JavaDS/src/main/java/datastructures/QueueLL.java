@@ -1,25 +1,24 @@
 package datastructures;
 
 /**
- * A queue is implemented using a circular linked list.
+ * Require two pointers
  * 
- * @author PocketmathUser
+ * @author abhinav.sunderrajan
  *
  * @param <T>
  */
 public class QueueLL<T extends Comparable<T>> {
 
-    // Note that tail.next is the head.
-    private Node tail;
+    private QueueNode first;
+    private QueueNode last;
     private int size;
 
-    private class Node {
-	private Node next;
+    private class QueueNode {
+	private QueueNode next;
 	private T value;
 
-	public Node(Node next, T t) {
-	    this.next = next;
-	    this.value = t;
+	public QueueNode(T value) {
+	    this.value = value;
 	}
 
 	public String toString() {
@@ -32,43 +31,43 @@ public class QueueLL<T extends Comparable<T>> {
     }
 
     public void add(T t) {
-	Node temp = new Node(null, t);
-	if (size == 0) {
-	    tail = temp;
-	    tail.next = temp;
-	} else {
-	    temp.next = tail.next;
-	    tail.next = temp;
-	    tail = temp;
+	QueueNode node = new QueueNode(t);
+	if (last == null)
+	    last = node;
+	else
+	    last.next = node;
 
-	}
-
+	if (first == null)
+	    first = node;
 	size++;
     }
 
     public T peep() {
-	return tail.next.value;
+	return first.value;
     }
 
     public T pop() {
 	size--;
-	T val = tail.next.value;
-	tail.next = tail.next.next;
+	T val = first.value;
+	first = first.next;
 	return val;
     }
 
     private String printContents() {
 
-	StringBuffer buffer = new StringBuffer("[");
-	Node current = tail.next;
-	while (true) {
-	    buffer.append(current.value + ",");
-	    current = current.next;
-	    if (current.equals(tail.next))
-		break;
-
+	if (size > 0) {
+	    StringBuffer buffer = new StringBuffer("[");
+	    QueueNode current = first;
+	    while (true) {
+		buffer.append(current.value + ",");
+		current = current.next;
+		if (current.next == null)
+		    break;
+	    }
+	    return buffer.replace(buffer.length() - 1, buffer.length(), "").append("]").toString();
+	} else {
+	    return "[]";
 	}
-	return buffer.replace(buffer.length() - 1, buffer.length(), "").append("]").toString();
 
     }
 

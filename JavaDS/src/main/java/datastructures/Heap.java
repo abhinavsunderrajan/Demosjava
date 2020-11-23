@@ -3,8 +3,8 @@ package datastructures;
 import java.util.Arrays;
 
 /**
- * My heap implementation. Note that the has a binary tree structure backed by
- * an array.
+ * My heap implementation. Note that the heap has a binary tree structure backed
+ * by an array.
  * 
  * @author abhinav
  *

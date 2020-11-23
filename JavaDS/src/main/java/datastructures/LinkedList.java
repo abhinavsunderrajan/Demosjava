@@ -9,32 +9,37 @@ package datastructures;
  */
 public class LinkedList<T> {
 
-    private Node head;
+    private ListNode head;
     private int size;
 
-    private class Node {
-	Node next;
+    public class ListNode {
+	ListNode next;
 	T value;
 
-	public Node(T value, Node next) {
+	public ListNode(T value) {
 	    this.value = value;
+	}
+
+	public void setNext(ListNode next) {
 	    this.next = next;
+	}
+
+	public void setValue(T value) {
+	    this.value = value;
 	}
 
 	public String toString() {
 	    return value.toString();
 	}
 
-    }
+	public ListNode getNext() {
+	    return next;
+	}
 
-    /**
-     * Add head to the linked list i.e the first element of the linked list.
-     * 
-     * @param value
-     */
-    private void addHead(T value) {
-	head = new Node(value, head);
-	size++;
+	public T getValue() {
+	    return value;
+	}
+
     }
 
     /**
@@ -43,13 +48,14 @@ public class LinkedList<T> {
      * @param value
      */
     public void add(T value) {
+	ListNode node = new ListNode(value);
 	if (size == 0)
-	    addHead(value);
+	    head = node;
 	else {
-	    Node last = head;
+	    ListNode last = head;
 	    while (last.next != null)
 		last = last.next;
-	    last.next = new Node(value, null);
+	    last.next = node;
 	    size++;
 	}
 
@@ -62,7 +68,7 @@ public class LinkedList<T> {
 	if (size > 0) {
 	    StringBuffer buffer = new StringBuffer("[");
 	    buffer.append(head.value + ",");
-	    Node nextNode = head.next;
+	    ListNode nextNode = head.next;
 	    while (nextNode != null) {
 		buffer.append(nextNode.value + ",");
 		nextNode = nextNode.next;
@@ -85,20 +91,20 @@ public class LinkedList<T> {
 	if (index > size)
 	    throw new IllegalArgumentException("Insert index cannot be greater than its current size: " + size);
 
+	ListNode node = new ListNode(value);
 	if (index == 0)
-	    addHead(value);
+	    head = node;
 	else if (index == size)
 	    add(value);
 	else {
 	    int i = 1;
-	    Node next = head.next;
-	    Node prev = head;
+	    ListNode next = head.next;
+	    ListNode prev = head;
 	    while (i < index) {
 		prev = next;
 		next = next.next;
 		i++;
 	    }
-	    Node node = new Node(value, next);
 	    prev.next = node;
 
 	}
@@ -116,12 +122,12 @@ public class LinkedList<T> {
 	    throw new IllegalArgumentException("Illegal index exception");
 	if (index == 0) {
 	    // delete head
-	    Node node = head.next;
+	    ListNode node = head.next;
 	    head = node;
 	} else {
 	    int i = 1;
-	    Node next = head.next;
-	    Node prev = head;
+	    ListNode next = head.next;
+	    ListNode prev = head;
 	    while (i < index) {
 		prev = next;
 		next = next.next;
@@ -142,7 +148,7 @@ public class LinkedList<T> {
      *            the value that you are searching for.
      * @return
      */
-    public boolean search(Node head, T val) {
+    public boolean search(ListNode head, T val) {
 	if (head == null)
 	    return false;
 	if (head.value.equals(val))
@@ -166,16 +172,19 @@ public class LinkedList<T> {
      * 
      * @return the head of the linked list.
      */
-    public Node getHead() {
+    public ListNode getHead() {
 	return head;
     }
 
+    public void setHead(ListNode head) {
+	this.head = head;
+    }
+
     public void reverseList() {
-	Node next = null;
-	Node current = this.head;
-	Node prev = null;
+	ListNode current = this.head;
+	ListNode prev = null;
 	while (current != null) {
-	    next = current.next;
+	    ListNode next = current.next;
 	    current.next = prev;
 	    prev = current;
 	    current = next;

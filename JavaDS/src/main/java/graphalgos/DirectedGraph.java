@@ -23,7 +23,8 @@ public class DirectedGraph {
     }
 
     /**
-     * Add a {@link Vertex} to the graph.
+     * Add a {@link Vertex} to the graph. The initial capacity of the list of
+     * edges is 20.
      * 
      * @param vertex
      */
@@ -56,7 +57,8 @@ public class DirectedGraph {
     }
 
     /**
-     * Breadth first traversal of the graph from the vertex passed as a parameter.
+     * Breadth first traversal of the graph from the vertex passed as a
+     * parameter.
      * 
      * @param source
      */
@@ -101,8 +103,8 @@ public class DirectedGraph {
     }
 
     /**
-     * Find all paths between source and destination vertices. Uses breadth first
-     * search implementation.
+     * Find all paths between source and destination vertices. Uses breadth
+     * first search implementation.
      * 
      * @param source
      * @param dest
@@ -158,8 +160,8 @@ public class DirectedGraph {
     }
 
     /**
-     * Returns true if the graph contains a cycle, else false. This function is a
-     * variation of DFS().
+     * Returns true if the graph contains a cycle, else false. This function is
+     * a variation of DFS().
      * 
      * @return true if graph is
      */

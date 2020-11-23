@@ -7,7 +7,6 @@ public class StringPermute {
 
     public static void main(String[] args) {
 	String str = "ABC";
-	// permuteBackTrack(str, 0, str.length());
 	System.out.println(permute(str));
 
     }

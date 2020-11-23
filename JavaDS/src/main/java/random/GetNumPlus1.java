@@ -7,7 +7,7 @@ public class GetNumPlus1 {
 
     public static void main(String[] args) {
 
-	int array1[] = { 9, 9, 8 };
+	int array1[] = { 9, 9, 9 };
 	int answer[] = getPlus1Array(array1);
 	for (int a : answer)
 	    System.out.print(a + " ");

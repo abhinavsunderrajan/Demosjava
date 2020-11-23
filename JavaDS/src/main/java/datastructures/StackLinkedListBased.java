@@ -1,21 +1,27 @@
 package datastructures;
 
 public class StackLinkedListBased<T extends Comparable<T>> {
-    private Node head;
+    private StackNode top;
     private int size;
 
-    private class Node {
-	private Node next;
+    private class StackNode {
+	private StackNode prev;
 	private T value;
 
-	public Node(Node next, T t) {
-	    this.next = next;
+	public StackNode(T t) {
 	    this.value = t;
 	}
     }
 
     public void push(T t) {
-	head = new Node(head, t);
+	StackNode newNode = new StackNode(t);
+	if (top == null)
+	    top = newNode;
+	else {
+	    top.prev = top;
+	    top = newNode;
+
+	}
 	size++;
     }
 
@@ -23,8 +29,8 @@ public class StackLinkedListBased<T extends Comparable<T>> {
 	if (size == 0)
 	    return null;
 
-	T val = head.value;
-	head = head.next;
+	T val = top.value;
+	top = top.prev;
 	size--;
 	return val;
     }
@@ -32,11 +38,11 @@ public class StackLinkedListBased<T extends Comparable<T>> {
     public String printContents() {
 	if (size == 0)
 	    return "[]";
-	Node current = head;
+	StackNode current = top;
 	StringBuffer buf = new StringBuffer("[");
 	do {
 	    buf.append(current.value + ",");
-	    current = current.next;
+	    current = current.prev;
 	} while (current != null);
 	buf.replace(buf.length() - 1, buf.length(), "").append("]");
 	return buf.toString();
@@ -44,7 +50,7 @@ public class StackLinkedListBased<T extends Comparable<T>> {
     }
 
     public T peek() {
-	return head.value;
+	return top.value;
     }
 
     public int getSize() {
@@ -64,7 +70,7 @@ public class StackLinkedListBased<T extends Comparable<T>> {
     }
 
     public void clear() {
-	head = null;
+	top = null;
 	size = 0;
     }
 

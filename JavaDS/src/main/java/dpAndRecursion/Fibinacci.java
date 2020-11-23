@@ -16,7 +16,7 @@ public class Fibinacci {
 	System.out.println((System.currentTimeMillis() - t1) / 1000 + " seconds");
 
 	t1 = System.currentTimeMillis();
-	long memo[] = new long[FIB];
+	long memo[] = new long[FIB + 1];
 	System.out.println(fibinacciMemoization(FIB, memo));
 	System.out.println((System.currentTimeMillis() - t1) / 1000 + " seconds");
 	StringBuffer buf = new StringBuffer("");
@@ -52,14 +52,14 @@ public class Fibinacci {
     }
 
     private static long fibinacciMemoization(int n, long memo[]) {
-	if (memo[n - 1] != 0l) {
-	    return memo[n - 1];
+	if (memo[n] != 0l) {
+	    return memo[n];
 	}
 	if (n == 1 || n == 2)
 	    return 1;
 	else {
 	    long result = fibinacciMemoization(n - 1, memo) + fibinacciMemoization(n - 2, memo);
-	    memo[n - 1] = result;
+	    memo[n] = result;
 	    return result;
 	}
 

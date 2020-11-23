@@ -9,19 +9,19 @@ class NumOfWaysToClimbStairs {
 	    return 1;
 	else if (n == 2)
 	    return 2;
-	else if (cache[n - 1] > 0) {
-	    return cache[n - 1];
+	else if (cache[n] > 0) {
+	    return cache[n];
 	} else {
 	    int result = climbStairs(n - 1, cache) + climbStairs(n - 2, cache);
-	    cache[n - 1] = result;
+	    cache[n] = result;
 	    return result;
 	}
 
     }
 
     public static void main(String args[]) {
-	int[] cache = new int[NUM_STEPS];
-	System.out.println("Number of ways to climb " + climbStairs(NUM_STEPS, cache));
+	int[] cache = new int[NUM_STEPS + 1];
+	System.out.println("Number of ways to climb " + NUM_STEPS + " steps " + climbStairs(NUM_STEPS, cache));
 
     }
 }
