@@ -30,7 +30,7 @@ public class RecursiveExponentiation {
     public static void main(String[] args) {
 
 	int x = 3;
-	int n = 5;
+	int n = 10;
 	System.out.println(power(x, n));
     }
 

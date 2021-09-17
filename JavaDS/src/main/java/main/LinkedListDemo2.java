@@ -54,7 +54,7 @@ public class LinkedListDemo2 {
     }
 
     private static void reverseList() {
-	// rever the list
+	// reverse the list
 	ListNode current = ll.getHead();
 	ListNode prev = null;
 	while (current != null) {

@@ -5,7 +5,7 @@ public class StackLinkedListBased<T extends Comparable<T>> {
     private int size;
 
     private class StackNode {
-	private StackNode prev;
+	private StackNode next;
 	private T value;
 
 	public StackNode(T t) {
@@ -18,7 +18,7 @@ public class StackLinkedListBased<T extends Comparable<T>> {
 	if (top == null)
 	    top = newNode;
 	else {
-	    top.prev = top;
+	    newNode.next = top;
 	    top = newNode;
 
 	}
@@ -30,7 +30,7 @@ public class StackLinkedListBased<T extends Comparable<T>> {
 	    return null;
 
 	T val = top.value;
-	top = top.prev;
+	top = top.next;
 	size--;
 	return val;
     }
@@ -42,7 +42,7 @@ public class StackLinkedListBased<T extends Comparable<T>> {
 	StringBuffer buf = new StringBuffer("[");
 	do {
 	    buf.append(current.value + ",");
-	    current = current.prev;
+	    current = current.next;
 	} while (current != null);
 	buf.replace(buf.length() - 1, buf.length(), "").append("]");
 	return buf.toString();

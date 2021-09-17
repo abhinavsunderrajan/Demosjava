@@ -1,6 +1,6 @@
 package main;
 
-import datastructures.StackLinkedListBased;
+import java.util.Stack;
 
 public class ParathesisChecker {
 
@@ -16,7 +16,7 @@ public class ParathesisChecker {
     }
 
     private static boolean checkValid(String str) {
-	StackLinkedListBased<Character> stack = new StackLinkedListBased<>();
+	Stack<Character> stack = new Stack<>();
 
 	boolean result = true;
 	if (str.matches("(([^)]+))")) {
@@ -46,7 +46,7 @@ public class ParathesisChecker {
 		}
 	    }
 	}
-	return result;
+	return result && stack.isEmpty();
 
     }
 

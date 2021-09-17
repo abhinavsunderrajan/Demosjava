@@ -2,10 +2,10 @@ package dpAndRecursion;
 
 public class MakeChange {
 
-    private static final int[] DENOMS = { 25, 10, 5, 1 };
+    private static final int[] DENOMS = { 1, 2, 5 };
 
     public static void main(String[] args) {
-	int amount = 100;
+	int amount = 11;
 	long[][] cache = new long[amount + 1][DENOMS.length];
 	long numOfWays = makeChange(amount, cache, 0);
 	System.out.println(numOfWays);
@@ -13,15 +13,20 @@ public class MakeChange {
     }
 
     private static long makeChange(int amount, long[][] cache, int index) {
+	if (index == DENOMS.length)
+	    return 0;
+	if (amount == 0)
+	    return 1;
+	if (amount < 0)
+	    return 0;
 	if (cache[amount][index] > 0)
 	    return cache[amount][index];
-	if (index >= DENOMS.length - 1)
-	    return 1;
 
 	int denom = DENOMS[index];
 	long result = 0;
-	for (int i = 0; denom * i <= amount; i++) {
-	    int amountRemaining = amount - i * denom;
+	for (int numCoins = 0; denom * numCoins <= amount; numCoins++) {
+	    int amountRemaining = amount - numCoins * denom;
+	    System.out.println(amountRemaining + ", " + numCoins + ", " + denom);
 	    result += makeChange(amountRemaining, cache, index + 1);
 	}
 

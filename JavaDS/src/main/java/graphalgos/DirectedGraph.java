@@ -68,7 +68,7 @@ public class DirectedGraph {
 	source.setVisited(true);
 	while (!q.isEmpty()) {
 	    Vertex node = q.poll();
-	    node.setVisited(true);
+	    // node.setVisited(true);
 	    for (Edge e : adjacencyList.get(node)) {
 		Vertex n = e.getDestination();
 		if (!n.isVisited()) {

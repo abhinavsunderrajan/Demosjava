@@ -2,19 +2,15 @@ package bitwiseAndStr;
 
 public class CheckIfStrIsPermOfPalindrome {
 
-    private static boolean checkpermsPalin(String check) {
-	if (check.length() % 2 == 0)
-	    return false;
-
+    private static boolean checkpermsPalin(String s) {
 	int placeholder[] = new int[128];
 
-	for (char c : check.toCharArray()) {
+	for (char c : s.toCharArray())
 	    placeholder[c]++;
-	}
 
 	int numofOdd = 0;
-	for (char c : check.toCharArray()) {
-	    if (placeholder[c] % 2 == 1)
+	for (int i : placeholder) {
+	    if (i % 2 == 1)
 		numofOdd++;
 	    if (numofOdd > 1)
 		return false;

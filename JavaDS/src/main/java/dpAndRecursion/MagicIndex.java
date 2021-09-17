@@ -1,7 +1,7 @@
 package dpAndRecursion;
 
 /**
- * a[i] ==i a is sorted
+ * a[i] == i a is sorted
  * 
  * @author 746310
  *
